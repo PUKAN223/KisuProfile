@@ -26,6 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Preload the video for instant playback */}
+        <link rel="preload" href="/mv.mp4" as="video" type="video/mp4" />
+      </head>
       <body className={`font-sans antialiased`}>
         {children}
         <Analytics />
