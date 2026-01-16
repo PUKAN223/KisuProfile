@@ -24,7 +24,9 @@ export const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps
         muted
         playsInline
         preload="auto"
-        onLoadedData={() => setIsLoaded(true)}
+        onCanPlayThrough={() => setIsLoaded(true)}
+        onWaiting={() => setIsLoaded(false)}
+        onPlaying={() => setIsLoaded(true)}
       >
         <source src="/mv.mp4" type="video/mp4" />
       </video>
