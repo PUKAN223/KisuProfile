@@ -79,7 +79,7 @@ export function ProfileCard(
 
       <div className={styles.nameSection}>
         <h1 className={styles.name}>Kisu X3</h1>
-        <p className={styles.subtitle}>Coding is my life.</p>
+        <p className={styles.subtitle + " font-mono"}>Coding is my life.</p>
       </div>
 
       <div className={styles.contentArea}>
