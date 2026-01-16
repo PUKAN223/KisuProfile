@@ -12,13 +12,15 @@ interface ProfileCardProps {
   onToggleMute: () => void;
   onTogglePlay: () => void;
   videoRef: RefObject<HTMLVideoElement | null>;
+  isVideoLoaded?: boolean;
 }
 
 export function ProfileCard(
-  { isMuted, isPlaying, onToggleMute, onTogglePlay, videoRef }:
+  { isMuted, isPlaying, onToggleMute, onTogglePlay, videoRef, isVideoLoaded = false }:
     ProfileCardProps,
 ) {
   const [isLoading, setIsLoading] = useState(true);
+  const [isAvatarLoaded, setIsAvatarLoaded] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
   const [typedText, setTypedText] = useState("");
@@ -48,12 +50,18 @@ export function ProfileCard(
     };
 
     fetchDiscordAvatar().then(() => {
+      setIsAvatarLoaded(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (isAvatarLoaded && isVideoLoaded) {
       const loadTimer = setTimeout(() => {
         setIsLoading(false);
       }, 1000);
       return () => clearTimeout(loadTimer);
-    });
-  }, []);
+    }
+  }, [isAvatarLoaded, isVideoLoaded]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -94,7 +102,7 @@ export function ProfileCard(
         <h1 className={styles.name}>Kisu X3</h1>
         <p className={styles.subtitle + " font-mono min-h-[24px]"}>
           {typedText}
-          {typedText.length < fullText.length && (
+          {!isLoading && typedText.length < fullText.length && (
             <span className="animate-pulse inline-block ml-1 w-2 h-4 bg-white/50 align-middle"></span>
           )}
         </p>

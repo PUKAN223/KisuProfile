@@ -8,9 +8,12 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Profile",
+  title: "Kisu X3",
   description: "Personal profile with glassmorphism design",
-    generator: 'v0.app'
+  generator: 'v0.app',
+  icons: {
+    icon: '/profile.jpg',
+  },
 }
 
 export const viewport: Viewport = {

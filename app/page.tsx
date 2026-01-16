@@ -24,7 +24,15 @@ export default function Home() {
   const [showVolumeDialog, setShowVolumeDialog] = useState(true);
   const [blurAmount, setBlurAmount] = useState(50); // Start with higher blur
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Check if video is already ready (e.g. from cache)
+    if (videoRef.current && videoRef.current.readyState >= 3) {
+      setIsVideoLoaded(true);
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -85,7 +93,12 @@ export default function Home() {
     <main className={styles.main}>
       <CursorEffects />
       <ViewCounter />
-      <BackgroundVideo ref={videoRef} blurAmount={blurAmount} />
+      <BackgroundVideo 
+        ref={videoRef} 
+        blurAmount={blurAmount} 
+        onVideoLoaded={() => setIsVideoLoaded(true)} 
+        isReady={isVideoLoaded}
+      />
       <div className={styles.overlay} />
       <div className={styles.content}>
         <ProfileCard
@@ -94,6 +107,7 @@ export default function Home() {
           onToggleMute={toggleMute}
           onTogglePlay={togglePlay}
           videoRef={videoRef}
+          isVideoLoaded={isVideoLoaded}
         />
       </div>
       {!showVolumeDialog && (

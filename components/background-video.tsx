@@ -5,11 +5,19 @@ import styles from "./background-video.module.css"
 
 interface BackgroundVideoProps {
   blurAmount?: number
+  onVideoLoaded?: () => void
+  isReady?: boolean
 }
 
 export const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(
-  ({ blurAmount = 8 }, ref) => {
+  ({ blurAmount = 8, onVideoLoaded, isReady = false }, ref) => {
+    // Keep internal logic as fallback, but prefer isReady prop
     const [isLoaded, setIsLoaded] = useState(false)
+
+    const handleLoaded = () => {
+      setIsLoaded(true)
+      if (onVideoLoaded) onVideoLoaded()
+    }
 
     return (
       <video
@@ -17,16 +25,17 @@ export const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps
         className={styles.video}
         style={{ 
           filter: `blur(${blurAmount}px)`,
-          opacity: isLoaded ? 1 : 0 
+          opacity: isReady || isLoaded ? 1 : 0 
         }}
         autoPlay
         loop
         muted
         playsInline
         preload="auto"
-        onCanPlayThrough={() => setIsLoaded(true)}
-        onWaiting={() => setIsLoaded(false)}
-        onPlaying={() => setIsLoaded(true)}
+        onLoadedData={handleLoaded}
+        onCanPlay={handleLoaded}
+        onCanPlayThrough={handleLoaded}
+        onPlaying={handleLoaded}
       >
         <source src="/mv.mp4" type="video/mp4" />
       </video>
