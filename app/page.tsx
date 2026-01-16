@@ -112,7 +112,7 @@ export default function Home() {
             </div>
             <div className="w-32 sm:w-64 h-1 sm:h-1.5 bg-white/10 rounded-full overflow-hidden backdrop-blur-md border border-white/5">
               <div 
-                className="h-full bg-gradient-to-r from-transparent via-white/80 to-white shadow-[0_0_15px_rgba(255,255,255,0.8)] transition-all duration-75 ease-out relative"
+                className="h-full bg-gradient-to-r from-transparent via-white/80 to-white shadow-[0_0_15px_rgba(255,255,255,0.8)] transition-none relative"
                 style={{ width: `${Math.max((blurAmount / 20) * 100, 0)}%` }}
               >
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,1)]" />
