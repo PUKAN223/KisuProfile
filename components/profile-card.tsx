@@ -94,7 +94,9 @@ export function ProfileCard(
         <h1 className={styles.name}>Kisu X3</h1>
         <p className={styles.subtitle + " font-mono min-h-[24px]"}>
           {typedText}
-          <span className="animate-pulse inline-block ml-1 w-2 h-4 bg-white/50 align-middle"></span>
+          {typedText.length < fullText.length && (
+            <span className="animate-pulse inline-block ml-1 w-2 h-4 bg-white/50 align-middle"></span>
+          )}
         </p>
       </div>
 
