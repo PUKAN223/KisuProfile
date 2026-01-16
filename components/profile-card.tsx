@@ -21,6 +21,8 @@ export function ProfileCard(
   const [isLoading, setIsLoading] = useState(true);
   const [showContent, setShowContent] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [typedText, setTypedText] = useState("");
+  const fullText = "Coding is my life.";
   const userId = "889470463510712320";
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export function ProfileCard(
           );
         }
       } catch (error) {
-        console.error("Failed to fetch Discord avatar:", error);
+        console.log("Failed to fetch Discord avatar:", error);
       }
     };
 
@@ -62,6 +64,17 @@ export function ProfileCard(
     }
   }, [isLoading]);
 
+  useEffect(() => {
+    if (showContent && isPlaying) {
+      if (typedText.length < fullText.length) {
+        const timeout = setTimeout(() => {
+          setTypedText(fullText.slice(0, typedText.length + 1));
+        }, 100);
+        return () => clearTimeout(timeout);
+      }
+    }
+  }, [showContent, isPlaying, typedText]);
+
   return (
     <div className={styles.container}>
       <div className={styles.avatarWrapper}>
@@ -79,7 +92,10 @@ export function ProfileCard(
 
       <div className={styles.nameSection}>
         <h1 className={styles.name}>Kisu X3</h1>
-        <p className={styles.subtitle + " font-mono"}>Coding is my life.</p>
+        <p className={styles.subtitle + " font-mono min-h-[24px]"}>
+          {typedText}
+          <span className="animate-pulse inline-block ml-1 w-2 h-4 bg-white/50 align-middle"></span>
+        </p>
       </div>
 
       <div className={styles.contentArea}>
@@ -96,13 +112,6 @@ export function ProfileCard(
               }`}
             >
               <SocialIcons />
-              <MusicManager
-                isMuted={isMuted}
-                isPlaying={isPlaying}
-                onToggleMute={onToggleMute}
-                onTogglePlay={onTogglePlay}
-                videoRef={videoRef}
-              />
             </div>
           )}
       </div>
