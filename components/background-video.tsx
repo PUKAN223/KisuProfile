@@ -18,6 +18,7 @@ export const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps
         loop
         muted
         playsInline
+        preload="auto"
       >
         <source src="/mv.mp4" type="video/mp4" />
       </video>
