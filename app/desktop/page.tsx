@@ -28,12 +28,31 @@ export default function Home() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [time, setTime] = useState("");
 
   useEffect(() => {
     // Check if video is already ready (e.g. from cache)
     if (videoRef.current && videoRef.current.readyState >= 3) {
       setIsVideoLoaded(true);
     }
+  }, []);
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Bangkok',
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      setTime(formatter.format(now));
+    };
+    
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -129,6 +148,15 @@ export default function Home() {
       </div>
       {!showVolumeDialog && (
         <>
+          <div className="fixed top-4 left-4 z-40 flex flex-col gap-1 animate-in slide-in-from-left-10 fade-in duration-700 pointer-events-none">
+            <span className="text-white/60 text-[10px] sm:text-xs font-mono uppercase tracking-widest">
+              Bangkok
+            </span>
+            <span className="text-white font-mono text-base sm:text-lg font-bold tabular-nums">
+              {time}
+            </span>
+          </div>
+
           <div
             className="fixed bottom-42 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 text-white/60 text-sm flex items-center gap-2 animate-bounce transition-opacity duration-300 pointer-events-none"
             style={{ opacity: scrollProgress > 0.9 ? 0 : 1 }}
