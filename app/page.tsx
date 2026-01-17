@@ -113,7 +113,7 @@ export default function Home() {
       {!showVolumeDialog && (
         <>
           <div
-            className="fixed bottom-42 sm:bottom-4 left-1/2  pb-10 -translate-x-1/2 z-40 text-white/60 text-sm flex items-center gap-2 animate-bounce transition-opacity duration-300 pointer-events-none"
+            className="fixed bottom-42 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 text-white/60 text-sm flex items-center gap-2 animate-bounce transition-opacity duration-300 pointer-events-none"
             style={{ opacity: scrollProgress > 0.9 ? 0 : 1 }}
           >
             <svg
@@ -129,7 +129,7 @@ export default function Home() {
             <span>Scroll to adjust blur</span>
           </div>
 
-          <div className="fixed top-4 right-4 sm:top-auto pb-10 sm:bottom-8 sm:right-8 z-40 flex flex-col items-end gap-2 animate-in slide-in-from-right-10 fade-in duration-700 pointer-events-none">
+          <div className="fixed top-4 right-4 sm:top-auto sm:bottom-8 sm:right-8 z-40 flex flex-col items-end gap-2 animate-in slide-in-from-right-10 fade-in duration-700 pointer-events-none">
             <div className="flex items-center gap-3">
               <span className="text-white/60 text-[10px] sm:text-xs font-mono uppercase tracking-widest">
                 blur intensity
@@ -148,7 +148,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="fixed bottom-4 left-4 right-4 sm:right-auto pb-10 sm:bottom-8 sm:left-8 z-40 sm:w-72 animate-in slide-in-from-left-10 fade-in duration-700">
+          <div className="fixed bottom-4 left-4 right-4 sm:right-auto sm:bottom-8 sm:left-8 z-40 sm:w-72 animate-in slide-in-from-left-10 fade-in duration-700">
             <div className="bg-black/20 backdrop-blur-md rounded-xl border border-white/10 px-4 py-4 shadow-lg w-full">
               <MusicManager
                 isMuted={isMuted}
