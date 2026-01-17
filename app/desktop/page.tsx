@@ -5,7 +5,7 @@ import { BackgroundVideo } from "@/components/background-video";
 import { ProfileCard } from "@/components/profile-card";
 import { MusicManager } from "@/components/music-manager";
 import { ViewCounter } from "@/components/view-counter";
-import { CursorEffects } from "@/components/cursor-effects"
+import { CursorEffects } from "@/components/cursor-effects";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,17 +16,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import styles from "./page.module.css";
+import styles from "../page.module.css";
 
 export default function Home() {
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [showVolumeDialog, setShowVolumeDialog] = useState(true);
+  const [showVolumeDialog, setShowVolumeDialog] = useState(false);
   const [blurAmount, setBlurAmount] = useState(50); // Start with higher blur
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [spotifyPlaying, setSpotifyPlaying] = useState(false);
   const [spotifyCover, setSpotifyCover] = useState<string | null>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -37,7 +37,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // Use blur effect based on scroll
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const maxScroll = window.innerHeight; // defined scroll range
@@ -56,20 +55,6 @@ export default function Home() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const handleSpotifyChange = useCallback((isPlaying: boolean, data: any) => {
-    setSpotifyPlaying(isPlaying);
-    if (isPlaying && data?.cover) {
-       setSpotifyCover(data.cover);
-       // Auto mute local video if spotify is playing
-       if (videoRef.current && !videoRef.current.muted) {
-          videoRef.current.muted = true;
-          setIsMuted(true);
-       }
-    } else {
-       setSpotifyCover(null);
-    }
   }, []);
 
   const toggleMute = () => {
@@ -106,18 +91,31 @@ export default function Home() {
     }
   };
 
+  const handleSpotifyChange = useCallback((isPlaying: boolean, data: any) => {
+    console.log("Spotify State:", isPlaying, data);
+    setSpotifyPlaying(isPlaying);
+    if (isPlaying && data?.cover) {
+      setSpotifyCover(data.cover);
+      // Auto mute local video if spotify is playing
+      if (videoRef.current && !videoRef.current.muted) {
+        videoRef.current.muted = true;
+        setIsMuted(true);
+      }
+    } else {
+      setSpotifyCover(null);
+    }
+  }, []);
+
   return (
     <main className={styles.main}>
       <CursorEffects />
-      <ViewCounter />
-      <BackgroundVideo 
-        ref={videoRef} 
-        blurAmount={blurAmount} 
-        onVideoLoaded={() => setIsVideoLoaded(true)} 
+      <BackgroundVideo
+        ref={videoRef}
+        blurAmount={blurAmount}
+        onVideoLoaded={() => setIsVideoLoaded(true)}
         isReady={isVideoLoaded}
         spotifyCover={spotifyPlaying ? spotifyCover : null}
       />
-      
       <div className={styles.overlay} />
       <div className={styles.content}>
         <ProfileCard
@@ -167,46 +165,20 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="fixed bottom-4 left-4 right-4 sm:right-auto sm:bottom-8 sm:left-8 z-40 sm:w-80 animate-in slide-in-from-left-10 fade-in duration-700">
-            <div className={`transition-all duration-500 ease-out backdrop-blur-xl rounded-2xl border px-5 py-4 shadow-2xl w-full ${
-              spotifyPlaying 
-              ? "bg-black/40 border-white/10 hover:bg-black/50" 
-              : "bg-black/20 border-white/5 hover:bg-black/30"
-            }`}>
+          <div className="fixed bottom-4 left-4 right-4 sm:right-auto sm:bottom-8 sm:left-8 z-40 sm:w-72 animate-in slide-in-from-left-10 fade-in duration-700">
+            <div className="bg-black/20 backdrop-blur-md rounded-xl border border-white/10 px-4 py-4 shadow-lg w-full">
               <MusicManager
                 isMuted={isMuted}
                 isPlaying={isPlaying}
                 onToggleMute={toggleMute}
                 onTogglePlay={togglePlay}
                 videoRef={videoRef}
-                onSpotifyChange={(isPlaying, data) => {
-                  handleSpotifyChange(isPlaying, data)
-                }}
+                onSpotifyChange={handleSpotifyChange}
               />
             </div>
           </div>
         </>
       )}
-
-      <AlertDialog open={showVolumeDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Allow Audio?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This website uses background music. Would you like to enable
-              audio?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDenyVolume}>
-              No, keep muted
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleAllowVolume}>
-              Yes, allow audio
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </main>
   );
 }

@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "append_css",
+			"type": "shell",
+			"command": "Add CSS to globals.css",
+			"args": [
+				"c:\\Users\\KisuX3\\Downloads\\personal-profile-website\\app\\globals.css",
+				"\n@keyframes music-bar {\n  0%, 100% { height: 40%; }\n  50% { height: 100%; }\n}\n.animate-music-bar {\n  animation: music-bar 1s ease-in-out infinite;\n}\n"
+			],
+			"group": "none"
+		}
+	]
+}
