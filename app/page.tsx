@@ -20,7 +20,7 @@ import styles from "./page.module.css";
 
 export default function Home() {
   const [isMuted, setIsMuted] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [showVolumeDialog, setShowVolumeDialog] = useState(true);
   const [blurAmount, setBlurAmount] = useState(50); // Start with higher blur
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -76,16 +76,20 @@ export default function Home() {
   const handleAllowVolume = () => {
     setShowVolumeDialog(false);
     setIsMuted(false);
+    setIsPlaying(true);
     if (videoRef.current) {
       videoRef.current.muted = false;
+      videoRef.current.play().catch((e) => console.log("Play failed", e));
     }
   };
 
   const handleDenyVolume = () => {
     setShowVolumeDialog(false);
     setIsMuted(true);
+    setIsPlaying(true);
     if (videoRef.current) {
       videoRef.current.muted = true;
+      videoRef.current.play().catch((e) => console.log("Play failed", e));
     }
   };
 

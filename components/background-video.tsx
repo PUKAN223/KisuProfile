@@ -27,7 +27,6 @@ export const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps
           filter: `blur(${blurAmount}px)`,
           opacity: isReady || isLoaded ? 1 : 0 
         }}
-        autoPlay
         loop
         muted
         playsInline
