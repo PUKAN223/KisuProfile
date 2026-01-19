@@ -6,7 +6,9 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "desktop": "bun run build && concurrently -k -s first \"next start\" \"wait-on tcp:3000 && bun run electron-start\"",
+    "electron-start": "bun tsc electron/main.ts electron/wallpaper.ts --outDir dist-electron --module commonjs --target es2020 --esModuleInterop --skipLibCheck && electron dist-electron/main.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -65,9 +67,13 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
+    "electron": "^40.0.0",
+    "koffi": "^2.15.0",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wait-on": "^9.0.3"
   }
 }

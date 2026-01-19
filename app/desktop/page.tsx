@@ -29,6 +29,18 @@ export default function Home() {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [time, setTime] = useState("");
+  const [timer, setTimer] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerRunning) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning]);
 
   useEffect(() => {
     // Check if video is already ready (e.g. from cache)
@@ -155,6 +167,80 @@ export default function Home() {
             <span className="text-white font-mono text-base sm:text-lg font-bold tabular-nums">
               {time}
             </span>
+          </div>
+
+          <div className="fixed top-20 left-4 z-40 flex flex-col gap-1 animate-in slide-in-from-left-10 fade-in duration-700">
+            <span className="text-white/60 text-[10px] sm:text-xs font-mono uppercase tracking-widest pointer-events-none">
+              Session
+            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-white font-mono text-base sm:text-lg font-bold tabular-nums pointer-events-none min-w-[60px]">
+                {(() => {
+                  const h = Math.floor(timer / 3600);
+                  const m = Math.floor((timer % 3600) / 60);
+                  const s = timer % 60;
+                  if (h > 0) {
+                    return `${h.toString().padStart(2, "0")}:${m
+                      .toString()
+                      .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+                  }
+                  return `${m.toString().padStart(2, "0")}:${s
+                    .toString()
+                    .padStart(2, "0")}`;
+                })()}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setIsTimerRunning(!isTimerRunning)}
+                  className="p-1.5 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+                  aria-label={isTimerRunning ? "Pause" : "Start"}
+                >
+                  {isTimerRunning ? (
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      stroke="none"
+                    >
+                      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      stroke="none"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsTimerRunning(false);
+                    setTimer(0);
+                  }}
+                  className="p-1.5 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-colors"
+                  aria-label="Reset"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div
