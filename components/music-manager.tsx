@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, type RefObject } from "react"
+import { useState, useEffect, useRef, type RefObject } from "react"
 import { Slider } from "@/components/ui/slider"
 import styles from "./music-manager.module.css"
 import React from "react"
@@ -37,32 +37,57 @@ export function MusicManager({ isMuted, isPlaying, onToggleMute, onTogglePlay, v
   const [volume, setVolume] = useState(100)
   const [showVolume, setShowVolume] = useState(false)
   const [spotifyData, setSpotifyData] = useState<SpotifyData | null>(null)
+  const onSpotifyChangeRef = useRef(onSpotifyChange)
+
+  useEffect(() => {
+    onSpotifyChangeRef.current = onSpotifyChange
+  }, [onSpotifyChange])
   
   // Fetch Spotify data
   useEffect(() => {
+    let cancelled = false
+    let timer: ReturnType<typeof setTimeout> | null = null
+
     const fetchSpotify = async () => {
+      let nextDelay = 15000
+
       try {
-        const res = await fetch("/api/now-playing")
+        const res = await fetch("/api/now-playing", { cache: "no-store" })
         if (res.ok) {
           const data = await res.json()
-          if (onSpotifyChange) {
+          const currentlyPlaying = Boolean(data?.is_playing)
+          nextDelay = currentlyPlaying ? 5000 : 15000
+
+          if (!cancelled) {
             setSpotifyData(data)
-            onSpotifyChange(data?.is_playing ?? false, data)
+            onSpotifyChangeRef.current(currentlyPlaying, data)
           }
+        } else if (!cancelled) {
+          setSpotifyData(null)
+          onSpotifyChangeRef.current(false, null)
         }
       } catch (error) {
         console.error("Spotify fetch error", error)
-        if (onSpotifyChange) onSpotifyChange(false, null)
+        if (!cancelled) {
+          setSpotifyData(null)
+          onSpotifyChangeRef.current(false, null)
+        }
+      } finally {
+        if (!cancelled) {
+          // Poll faster while currently playing; slow down when idle or tab is hidden.
+          const delay = document.hidden ? 60000 : nextDelay
+          timer = setTimeout(fetchSpotify, delay)
+        }
       }
     }
 
-    // Initial fetch
     fetchSpotify()
 
-    // Poll every 5 seconds for quicker updates
-    const interval = setInterval(fetchSpotify, 5000)
-    return () => clearInterval(interval)
-  }, [onSpotifyChange])
+    return () => {
+      cancelled = true
+      if (timer) clearTimeout(timer)
+    }
+  }, [])
 
 
   // Removed timeout auto-close logic in favor of hover
@@ -83,11 +108,13 @@ export function MusicManager({ isMuted, isPlaying, onToggleMute, onTogglePlay, v
     // Initialize volume
     setVolume(video.volume * 100)
 
+    const handleVolumeChange = () => setVolume(video.volume * 100)
+
     video.addEventListener("timeupdate", updateProgress)
-    video.addEventListener("volumechange", () => setVolume(video.volume * 100))
+    video.addEventListener("volumechange", handleVolumeChange)
     return () => {
       video.removeEventListener("timeupdate", updateProgress)
-      video.removeEventListener("volumechange", () => setVolume(video.volume * 100))
+      video.removeEventListener("volumechange", handleVolumeChange)
     }
   }, [videoRef])
 

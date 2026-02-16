@@ -132,7 +132,9 @@ export default function Home() {
       {!showVolumeDialog && (
         <>
           <div
-            className="fixed bottom-42 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 text-white/60 text-sm flex items-center gap-2 animate-bounce transition-opacity duration-300 pointer-events-none"
+            className={`fixed left-1/2 -translate-x-1/2 sm:bottom-4 z-40 text-white/60 text-sm flex items-center gap-2 animate-bounce transition-opacity duration-300 pointer-events-none ${
+              spotifyPlaying ? "bottom-40" : "bottom-56"
+            }`}
             style={{ opacity: scrollProgress > 0.9 ? 0 : 1 }}
           >
             <svg
@@ -179,9 +181,7 @@ export default function Home() {
                 onToggleMute={toggleMute}
                 onTogglePlay={togglePlay}
                 videoRef={videoRef}
-                onSpotifyChange={(isPlaying, data) => {
-                  handleSpotifyChange(isPlaying, data)
-                }}
+                onSpotifyChange={handleSpotifyChange}
               />
             </div>
           </div>

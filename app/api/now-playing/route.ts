@@ -6,8 +6,14 @@ const refresh_token = process.env.SPOTIFY_REFRESH_TOKEN || process.env.REACT_APP
 
 const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
 const NOW_PLAYING_ENDPOINT = `https://api.spotify.com/v1/me/player/currently-playing`;
+let cachedAccessToken: string | null = null;
+let accessTokenExpiresAt = 0;
 
 const getAccessToken = async () => {
+    if (cachedAccessToken && Date.now() < accessTokenExpiresAt) {
+      return { access_token: cachedAccessToken };
+    }
+
     const basic = Buffer.from(`${client_id}:${client_secret}`).toString("base64");
     const response = await fetch(TOKEN_ENDPOINT, {
         method: "POST",
@@ -22,7 +28,14 @@ const getAccessToken = async () => {
         cache: 'no-store',
     });
 
-    return response.json();
+    const tokenData = await response.json();
+    if (tokenData?.access_token) {
+      cachedAccessToken = tokenData.access_token;
+      // Refresh 60s early to avoid edge expiration.
+      accessTokenExpiresAt = Date.now() + Math.max((tokenData.expires_in ?? 3600) - 60, 60) * 1000;
+    }
+
+    return tokenData;
 };
 
 export async function GET() {

@@ -6,9 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start",
-    "desktop": "bun run build && concurrently -k -s first \"next start\" \"wait-on tcp:3000 && bun run electron-start\"",
-    "electron-start": "bun tsc electron/main.ts electron/wallpaper.ts --outDir dist-electron --module commonjs --target es2020 --esModuleInterop --skipLibCheck && electron dist-electron/main.js"
+    "start": "next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
