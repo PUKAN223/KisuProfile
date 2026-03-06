@@ -1,33 +1,23 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { BackgroundVideo } from "@/components/background-video";
 import { ProfileCard } from "@/components/profile-card";
-import { MusicManager } from "@/components/music-manager";
+import { Portfolio } from "@/components/portfolio";
+import { EducationTimeline } from "@/components/education-timeline";
 import { ViewCounter } from "@/components/view-counter";
 import { CursorEffects } from "@/components/cursor-effects"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import styles from "./page.module.css";
 
 export default function Home() {
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [showVolumeDialog, setShowVolumeDialog] = useState(true);
-  const [blurAmount, setBlurAmount] = useState(50); // Start with higher blur
+
+  // Section visibility states
+  const [activeSection, setActiveSection] = useState<'hero' | 'timeline' | 'portfolio'>('hero');
   const [scrollProgress, setScrollProgress] = useState(0);
+
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [spotifyPlaying, setSpotifyPlaying] = useState(false);
-  const [spotifyCover, setSpotifyCover] = useState<string | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     // Check if video is already ready (e.g. from cache)
@@ -37,40 +27,27 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // Use blur effect based on scroll
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      const maxScroll = window.innerHeight; // defined scroll range
-      const progress = Math.min(Math.max(scrollY / maxScroll, 0), 1);
+      const vh = window.innerHeight;
 
-      setScrollProgress(progress);
+      // Calculate scroll progress for hero fade out (0 -> 1 as we approach 50vh)
+      const heroProgress = Math.min(scrollY / (0.5 * vh), 1);
+      setScrollProgress(heroProgress);
 
-      // Blur moves from 20px down to 0px
-      const maxBlur = 20;
-      const newBlur = Math.max(0, maxBlur - progress * maxBlur);
-      setBlurAmount(newBlur);
+      // Determine active section based on scroll position
+      if (scrollY < 0.4 * vh) {
+        setActiveSection('hero');
+      } else if (scrollY >= 0.4 * vh && scrollY < 1.6 * vh) {
+        setActiveSection('timeline');
+      } else {
+        setActiveSection('portfolio');
+      }
     };
-
-    // Initial call
-    handleScroll();
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const handleSpotifyChange = useCallback((isPlaying: boolean, data: any) => {
-    setSpotifyPlaying(isPlaying);
-    if (isPlaying && data?.cover) {
-       setSpotifyCover(data.cover);
-       // Auto mute local video if spotify is playing
-       if (videoRef.current && !videoRef.current.muted) {
-          videoRef.current.muted = true;
-          setIsMuted(true);
-       }
-    } else {
-       setSpotifyCover(null);
-    }
-  }, []);
+  }, []); // Remove dependency to prevent re-attaching listener
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -90,123 +67,61 @@ export default function Home() {
     }
   };
 
-  const handleAllowVolume = () => {
-    setShowVolumeDialog(false);
-    setIsMuted(false);
-    if (videoRef.current) {
-      videoRef.current.muted = false;
-    }
-  };
-
-  const handleDenyVolume = () => {
-    setShowVolumeDialog(false);
-    setIsMuted(true);
-    if (videoRef.current) {
-      videoRef.current.muted = true;
-    }
-  };
-
   return (
-    <main className={styles.main}>
+    <main className="relative w-screen h-[300vh] block scrollbar-hide">
       <CursorEffects />
       <ViewCounter />
-      <BackgroundVideo 
-        ref={videoRef} 
-        blurAmount={blurAmount} 
-        onVideoLoaded={() => setIsVideoLoaded(true)} 
+      <BackgroundVideo
+        ref={videoRef}
+        blurAmount={activeSection !== 'hero' ? 20 : 0}
+        onVideoLoaded={() => setIsVideoLoaded(true)}
         isReady={isVideoLoaded}
-        spotifyCover={spotifyPlaying ? spotifyCover : null}
+        spotifyCover={null}
       />
-      
-      <div className={styles.overlay} />
-      <div className={styles.content}>
-        <ProfileCard
-          isMuted={isMuted}
-          isPlaying={isPlaying}
-          onToggleMute={toggleMute}
-          onTogglePlay={togglePlay}
-          videoRef={videoRef}
-          isVideoLoaded={isVideoLoaded}
-        />
+
+      <div className="fixed inset-0 bg-linear-to-br from-black/70 via-[#141428]/80 to-black/70 backdrop-blur-md z-10" />
+
+      {/* Hero Section */}
+      <div
+        className="fixed inset-0 z-20 grid place-items-center p-4"
+        style={{
+          opacity: activeSection === 'hero' ? 1 : 0,
+          pointerEvents: activeSection === 'hero' ? 'auto' : 'none'
+        }}
+      >
+        <div
+          className="transition-all duration-700 ease-in-out"
+          style={{
+            transform: `translateY(-${scrollProgress * 50}px) scale(${1 - scrollProgress * 0.1})`
+          }}
+        >
+          <ProfileCard
+            isMuted={isMuted}
+            isPlaying={isPlaying}
+            onToggleMute={toggleMute}
+            onTogglePlay={togglePlay}
+            videoRef={videoRef}
+            isVideoLoaded={isVideoLoaded}
+          />
+        </div>
       </div>
-      {!showVolumeDialog && (
-        <>
-          <div
-            className={`fixed left-1/2 -translate-x-1/2 sm:bottom-4 z-40 text-white/60 text-sm flex items-center gap-2 animate-bounce transition-opacity duration-300 pointer-events-none ${
-              spotifyPlaying ? "bottom-40" : "bottom-56"
-            }`}
-            style={{ opacity: scrollProgress > 0.9 ? 0 : 1 }}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M12 5v14M19 12l-7 7-7-7" />
-            </svg>
-            <span>Scroll to adjust blur</span>
-          </div>
 
-          <div className="fixed top-4 right-4 sm:top-auto sm:bottom-8 sm:right-8 z-40 flex flex-col items-end gap-2 animate-in slide-in-from-right-10 fade-in duration-700 pointer-events-none">
-            <div className="flex items-center gap-3">
-              <span className="text-white/60 text-[10px] sm:text-xs font-mono uppercase tracking-widest">
-                blur intensity
-              </span>
-              <span className="text-white font-mono text-base sm:text-lg font-bold w-12 text-right">
-                {Math.round((blurAmount / 20) * 100)}%
-              </span>
-            </div>
-            <div className="w-32 sm:w-64 h-1 sm:h-1.5 bg-white/10 rounded-full overflow-hidden backdrop-blur-md border border-white/5">
-              <div
-                className="h-full bg-gradient-to-r from-transparent via-white/80 to-white shadow-[0_0_15px_rgba(255,255,255,0.8)] transition-none relative"
-                style={{ width: `${Math.max((blurAmount / 20) * 100, 0)}%` }}
-              >
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,1)]" />
-              </div>
-            </div>
-          </div>
+      {/* Education Timeline Section */}
+      <EducationTimeline visible={activeSection === 'timeline'} />
 
-          <div className="fixed bottom-4 left-4 right-4 sm:right-auto sm:bottom-8 sm:left-8 z-40 sm:w-80 animate-in slide-in-from-left-10 fade-in duration-700">
-            <div className={`transition-all duration-500 ease-out backdrop-blur-xl rounded-2xl border px-5 py-4 shadow-2xl w-full ${
-              spotifyPlaying 
-              ? "bg-black/40 border-white/10 hover:bg-black/50" 
-              : "bg-black/20 border-white/5 hover:bg-black/30"
-            }`}>
-              <MusicManager
-                isMuted={isMuted}
-                isPlaying={isPlaying}
-                onToggleMute={toggleMute}
-                onTogglePlay={togglePlay}
-                videoRef={videoRef}
-                onSpotifyChange={handleSpotifyChange}
-              />
-            </div>
-          </div>
-        </>
-      )}
+      {/* Portfolio Section */}
+      <Portfolio visible={activeSection === 'portfolio'} />
 
-      <AlertDialog open={showVolumeDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Allow Audio?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This website uses background music. Would you like to enable
-              audio?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDenyVolume}>
-              No, keep muted
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleAllowVolume}>
-              Yes, allow audio
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Scroll Indicator (Only visible on Hero) */}
+      <div
+        className={`fixed bottom-10 left-1/2 -translate-x-1/2 text-white/50 animate-bounce cursor-pointer z-50 pointer-events-none transition-opacity duration-300 ${activeSection === 'hero' ? "opacity-100" : "opacity-0"
+          }`}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
+        </svg>
+      </div>
+
     </main>
   );
 }

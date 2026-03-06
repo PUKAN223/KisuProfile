@@ -1,6 +1,7 @@
 "use client"
 
-import { forwardRef, useState } from "react"
+import { forwardRef, useState, useEffect } from "react"
+import Image from "next/image"
 import styles from "./background-video.module.css"
 
 interface BackgroundVideoProps {
@@ -11,7 +12,7 @@ interface BackgroundVideoProps {
   initialized?: boolean
 }
 
-export const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(
+export const BackgroundVideo = forwardRef<HTMLAudioElement, BackgroundVideoProps>(
   ({ blurAmount = 8, onVideoLoaded, isReady = false, spotifyCover = null, initialized = true }, ref) => {
     // Keep internal logic as fallback, but prefer isReady prop
     const [isLoaded, setIsLoaded] = useState(false)
@@ -21,38 +22,46 @@ export const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps
       if (onVideoLoaded) onVideoLoaded()
     }
 
-    // Determine opacity for video: hidden if cover exists
-    // Ensure spotifyCover is treated as boolean for this check
-    // If not initialized, everything is hidden (opacity 0)
+    // Determine opacity. If not initialized, everything hidden.
+    // If spotify cover is present, hide the background image.
+    // Otherwise show background image if ready/loaded.
     const hasCover = !!spotifyCover;
-    const videoOpacity = initialized 
+    const opacity = initialized
       ? (hasCover ? 0 : (isReady || isLoaded ? 1 : 0))
       : 0;
 
     return (
       <>
-        <video
+        {/* Audio Element for Lo-Fi Sound */}
+        <audio
           ref={ref}
+          autoPlay
+          loop
+          src="/lofi.mp3"
+          onCanPlay={handleLoaded} // Consider loaded when audio can play? Or image?
+        />
+
+        {/* Background Image (replacing MV) */}
+        <div
           className={styles.video}
-          style={{ 
+          style={{
             filter: `blur(${blurAmount}px)`,
-            opacity: videoOpacity,
+            opacity: opacity,
             transition: 'opacity 1s ease-in-out, filter 0.5s ease-out'
           }}
-          autoPlay={false} 
-          loop
-          muted
-          playsInline
-          preload="auto"
-          onLoadedData={handleLoaded}
-          onCanPlay={handleLoaded}
-          onCanPlayThrough={handleLoaded}
-          onPlaying={handleLoaded}
         >
-          <source src="/mv.mp4" type="video/mp4" />
-        </video>
+          <Image
+            src="/background.webp"
+            alt="Background"
+            fill
+            className="object-cover"
+            priority
+            onLoad={handleLoaded} // Trigger loaded when image is ready
+          />
+        </div>
 
-        <div 
+        {/* Spotify Cover Overlay */}
+        <div
           className={styles.video} // Reuse same positioning class
           style={{
             zIndex: 0, // Same level
@@ -61,7 +70,7 @@ export const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps
             backgroundPosition: 'center',
             opacity: hasCover ? 1 : 0,
             filter: `blur(${Math.max(8, blurAmount)}px) brightness(0.6)`,
-            transform: 'translate(-50%, -50%) scale(1.1)', // Match video positioning + scale
+            transform: 'translate(-50%, -50%) scale(1.1)', // Match positioning
             transition: 'opacity 1s ease-in-out',
             width: '100vw',
             height: '100vh',

@@ -1,11 +1,14 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Pixelify_Sans } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const pixelify = Pixelify_Sans({
+  subsets: ["latin"],
+  variable: "--font-pixelify",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   title: "Kisu X3",
@@ -33,7 +36,7 @@ export default function RootLayout({
         {/* Preload the video for instant playback */}
         <link rel="preload" href="/mv.mp4" as="video" type="video/mp4" />
       </head>
-      <body className={`font-sans antialiased`}>
+      <body className={`${pixelify.variable} font-sans antialiased text-white selection:bg-blue-500/30 selection:text-blue-100`}>
         {children}
         <Analytics />
       </body>
