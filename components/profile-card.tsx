@@ -1,13 +1,31 @@
 "use client";
 
-import { type RefObject, useEffect, useState, useRef } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { User, Calendar, GraduationCap, Code2, Sparkles, Heart, Music2, Music, Play, Pause, Volume2, VolumeX } from "lucide-react";
+import {
+  Calendar,
+  Code2,
+  GraduationCap,
+  Heart,
+  Music,
+  Music2,
+  Pause,
+  Play,
+  Sparkles,
+  User,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { SocialIcons } from "./social-icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import styles from "./profile-card.module.css";
 
 interface SpotifyData {
@@ -25,7 +43,7 @@ function formatTime(ms: number) {
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
 interface ProfileCardProps {
@@ -38,8 +56,14 @@ interface ProfileCardProps {
 }
 
 export function ProfileCard(
-  { isMuted, isPlaying, onToggleMute, onTogglePlay, videoRef, isVideoLoaded = false }:
-    ProfileCardProps,
+  {
+    isMuted,
+    isPlaying,
+    onToggleMute,
+    onTogglePlay,
+    videoRef,
+    isVideoLoaded = false,
+  }: ProfileCardProps,
 ) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAvatarLoaded, setIsAvatarLoaded] = useState(false);
@@ -163,8 +187,28 @@ export function ProfileCard(
               priority
             />
             {spotifyData?.is_playing && (
-              <div className="absolute bottom-0 right-0 bg-[#1DB954] text-black w-7 h-7 flex items-center justify-center rounded-full border-2 border-[#121212] z-20 shadow-[0_0_15px_rgba(29,185,84,0.6)] animate-in zoom-in duration-300">
-                <Music size={13} className="animate-pulse" />
+              <div className="absolute bottom-0 right-0 z-20 animate-in zoom-in duration-300">
+                {/* Outer glow ring */}
+                <div className="absolute inset-[-6px] rounded-full bg-[#1DB954]/25 blur-[10px]" />
+                {/* Glass badge */}
+                <div
+                  className="relative w-7 h-7 rounded-full flex items-center justify-center overflow-hidden border border-[#1DB954]/40 shadow-[0_0_12px_rgba(29,185,84,0.45),inset_0_1px_0_rgba(255,255,255,0.25)]"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(29,185,84,0.55) 0%, rgba(29,185,84,0.25) 50%, rgba(0,0,0,0.4) 100%)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                  }}
+                >
+                  {/* Inner specular highlight */}
+                  <div className="absolute top-0.5 left-1 w-3.5 h-1.5 rounded-full bg-white/30 blur-[4px]" />
+                  {/* Dark ring separator from avatar */}
+                  <div className="absolute inset-0 rounded-full ring-2 ring-[#0d0d0d]/70" />
+                  <Music
+                    size={12}
+                    className="relative z-10 text-white drop-shadow-[0_0_4px_rgba(29,185,84,0.9)] animate-pulse"
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -174,33 +218,56 @@ export function ProfileCard(
           sideOffset={10}
           className="bg-[#121212]/95 backdrop-blur-xl border border-white/10 text-white p-0 rounded-xl shadow-2xl overflow-hidden z-[60]"
         >
-          {spotifyData?.is_playing ? (
-            <div className="flex items-center gap-3 p-3 min-w-[220px] max-w-[260px]">
-              <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 shadow-lg border border-white/5">
-                {spotifyData.cover && (
-                  <Image src={spotifyData.cover} alt={spotifyData.name} fill className="object-cover" />
-                )}
-              </div>
-              <div className="flex flex-col min-w-0 flex-1 py-0.5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-bold truncate text-white leading-tight block">{spotifyData.name}</span>
-                  <Music size={10} className="text-[#1DB954] shrink-0 animate-pulse" />
+          {spotifyData?.is_playing
+            ? (
+              <div className="flex items-center gap-3 p-3 min-w-[220px] max-w-[260px]">
+                <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 shadow-lg border border-white/5">
+                  {spotifyData.cover && (
+                    <Image
+                      src={spotifyData.cover}
+                      alt={spotifyData.name}
+                      fill
+                      className="object-cover"
+                    />
+                  )}
                 </div>
-                <span className="text-[10px] text-white/50 truncate font-medium block mt-0.5">{spotifyData.artists}</span>
+                <div className="flex flex-col min-w-0 flex-1 py-0.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-bold truncate text-white leading-tight block">
+                      {spotifyData.name}
+                    </span>
+                    <Music
+                      size={10}
+                      className="text-[#1DB954] shrink-0 animate-pulse"
+                    />
+                  </div>
+                  <span className="text-[10px] text-white/50 truncate font-medium block mt-0.5">
+                    {spotifyData.artists}
+                  </span>
 
-                <div className="w-full bg-white/10 h-1 rounded-full mt-2.5 overflow-hidden">
-                  <div
-                    className="h-full bg-[#1DB954] rounded-full transition-all duration-1000 ease-linear"
-                    style={{ width: `${(spotifyData.progress_ms / spotifyData.duration_ms) * 100}%` }}
-                  />
-                </div>                <div className="flex justify-between items-center mt-1 text-[9px] font-medium text-white/30 font-mono">
-                  <span>{formatTime(spotifyData.progress_ms)}</span>
-                  <span>{formatTime(spotifyData.duration_ms)}</span>
-                </div>              </div>
-            </div>
-          ) : (
-            <div className="p-3 text-xs font-medium text-white/50">Not playing anything...</div>
-          )}
+                  <div className="w-full bg-white/10 h-1 rounded-full mt-2.5 overflow-hidden">
+                    <div
+                      className="h-full bg-[#1DB954] rounded-full transition-all duration-1000 ease-linear"
+                      style={{
+                        width: `${
+                          (spotifyData.progress_ms / spotifyData.duration_ms) *
+                          100
+                        }%`,
+                      }}
+                    />
+                  </div>{" "}
+                  <div className="flex justify-between items-center mt-1 text-[9px] font-medium text-white/30 font-mono">
+                    <span>{formatTime(spotifyData.progress_ms)}</span>
+                    <span>{formatTime(spotifyData.duration_ms)}</span>
+                  </div>
+                </div>
+              </div>
+            )
+            : (
+              <div className="p-3 text-xs font-medium text-white/50">
+                Not playing anything...
+              </div>
+            )}
         </TooltipContent>
       </Tooltip>
 
@@ -209,7 +276,8 @@ export function ProfileCard(
         <p className={styles.subtitle + " font-mono min-h-6"}>
           {typedText}
           {!isLoading && typedText.length < fullText.length && (
-            <span className="animate-pulse inline-block ml-1 w-2 h-4 bg-white/50 align-middle"></span>
+            <span className="animate-pulse inline-block ml-1 w-2 h-4 bg-white/50 align-middle">
+            </span>
           )}
         </p>
       </div>
@@ -223,66 +291,102 @@ export function ProfileCard(
           )
           : (
             <div
-              className={`${styles.revealContent} ${showContent ? styles.visible : ""
-                }`}
+              className={`${styles.revealContent} ${
+                showContent ? styles.visible : ""
+              }`}
             >
               <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6 bg-white/5 border border-white/10 rounded-xl">
-                  <TabsTrigger value="overview" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Overview</TabsTrigger>
-                  <TabsTrigger value="about" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">About Me</TabsTrigger>
+                <TabsList className="grid w-[260px] grid-cols-2 mb-6 mx-auto bg-white/5 border border-white/10 rounded-xl">
+                  <TabsTrigger
+                    value="overview"
+                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+                  >
+                    Overview
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="about"
+                    className="data-[state=active]:bg-white/10 data-[state=active]:text-white"
+                  >
+                    About Me
+                  </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="overview" className="space-y-6 mt-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  <div className={styles.infoSection}>
-                    <div className={styles.infoItem} title="That's me!">
-                      <span className={styles.infoLabel}>
-                        <User size={14} className="inline mr-2 text-blue-300" />
-                        Name
-                      </span>
-                      <span className={styles.infoValue}>Pukan</span>
-                    </div>
-                    <div className={styles.infoItem} title="Current Age">
-                      <span className={styles.infoLabel}>
-                        <Calendar size={14} className="inline mr-2 text-purple-300" />
-                        Age
-                      </span>
-                      <span className={styles.infoValue}>15</span>
-                    </div>
+                <TabsContent
+                  value="overview"
+                  className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-700"
+                >
+                  <div className="h-[280px] flex flex-col justify-between">
+                    <div className={styles.infoSection}>
+                      <div className={styles.infoItem} title="That's me!">
+                        <span className={styles.infoLabel}>
+                          <User
+                            size={14}
+                            className="inline mr-2 text-blue-300"
+                          />
+                          Name
+                        </span>
+                        <span className={styles.infoValue}>Pukan</span>
+                      </div>
+                      <div className={styles.infoItem} title="Current Age">
+                        <span className={styles.infoLabel}>
+                          <Calendar
+                            size={14}
+                            className="inline mr-2 text-purple-300"
+                          />
+                          Age
+                        </span>
+                        <span className={styles.infoValue}>15</span>
+                      </div>
 
-                    <div className={styles.infoItem} title="Radio Control">
-                      <span className={styles.infoLabel}>
-                        <Music2 size={14} className="inline mr-2 text-green-300" />
-                        Lofi Radio
-                      </span>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={onTogglePlay}
-                          className="hover:text-white text-white/70 transition-colors"
-                          aria-label={isPlaying ? "Pause" : "Play"}
-                        >
-                          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-                        </button>
-                        <button
-                          onClick={onToggleMute}
-                          className="hover:text-white text-white/70 transition-colors"
-                          aria-label={isMuted ? "Unmute" : "Mute"}
-                        >
-                          {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-                        </button>
+                      <div className={styles.infoItem} title="Radio Control">
+                        <span className={styles.infoLabel}>
+                          <Music2
+                            size={14}
+                            className="inline mr-2 text-green-300"
+                          />
+                          Lofi Radio
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={onTogglePlay}
+                            className="hover:text-white text-white/70 transition-colors"
+                            aria-label={isPlaying ? "Pause" : "Play"}
+                          >
+                            {isPlaying
+                              ? <Pause size={16} />
+                              : <Play size={16} />}
+                          </button>
+                          <button
+                            onClick={onToggleMute}
+                            className="hover:text-white text-white/70 transition-colors"
+                            aria-label={isMuted ? "Unmute" : "Mute"}
+                          >
+                            {isMuted
+                              ? <VolumeX size={16} />
+                              : <Volume2 size={16} />}
+                          </button>
+                        </div>
                       </div>
                     </div>
+                    <SocialIcons />
                   </div>
-                  <SocialIcons />
                 </TabsContent>
 
-                <TabsContent value="about" className="mt-0 animate-in fade-in slide-in-from-right-8 duration-500">
+                <TabsContent
+                  value="about"
+                  className="mt-0 animate-in fade-in slide-in-from-right-8 duration-500"
+                >
                   <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 shadow-xl space-y-5 text-left h-[280px] overflow-y-auto scrollbar-hide">
                     <div className="space-y-2 group">
                       <h3 className="text-xs font-bold text-white/40 uppercase tracking-[0.2em] flex items-center gap-2 group-hover:text-blue-300 transition-colors">
                         <Sparkles size={12} /> Bio
                       </h3>
                       <p className="text-sm text-white/80 leading-relaxed font-light border-l-2 border-blue-500/30 pl-3">
-                        I am passionate about technology and programming. In my free time, I enjoy listening to music and playing games. I enjoy learning new technologies, building useful projects, and improving my problem-solving skills as a developer.
+                        I am passionate about technology and programming. In my
+                        free time, I enjoy listening to music and playing games.
+                        I enjoy learning new technologies, building useful
+                        projects, and improving my problem-solving skills as a
+                        developer.
                       </p>
                     </div>
 
@@ -291,7 +395,13 @@ export function ProfileCard(
                         <Code2 size={12} /> Tech Stack
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {["React", "Next.js", "TypeScript", "Tailwind", "Node.js"].map((tech, i) => (
+                        {[
+                          "React",
+                          "Next.js",
+                          "TypeScript",
+                          "Tailwind",
+                          "Node.js",
+                        ].map((tech, i) => (
                           <Badge
                             key={tech}
                             variant="secondary"
@@ -309,7 +419,10 @@ export function ProfileCard(
                         <Heart size={12} /> Interests
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {["Music", "Gaming", "Design", "Anime"].map((interest, i) => (
+                        {["Music", "Gaming", "Design", "Anime"].map((
+                          interest,
+                          i,
+                        ) => (
                           <Badge
                             key={interest}
                             variant="outline"

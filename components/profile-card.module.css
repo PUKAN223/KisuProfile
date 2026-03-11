@@ -5,7 +5,6 @@
   min-width: 300px;
   max-width: 360px;
   width: 100%;
-  animation: fadeIn 0.6s ease-out forwards;
 }
 
 @keyframes fadeIn {
@@ -112,8 +111,6 @@
   z-index: 1;
   background: #0a0a0a;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  animation: avatarPop 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  animation-delay: 0.2s;
 }
 
 .avatarWrapper:hover .avatar {
@@ -125,7 +122,6 @@
 .nameSection {
   text-align: center;
   margin-bottom: 1.5rem;
-  animation: fadeIn 0.6s ease-out 0.2s both;
 }
 
 .name {

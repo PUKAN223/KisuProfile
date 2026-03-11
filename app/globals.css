@@ -120,16 +120,18 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Hide default cursor to use custom pixel cursor */
-html,
-body,
-a,
-button,
-input,
-select,
-textarea,
-[role="button"] {
-  cursor: none !important;
+/* Hide default cursor only on true pointer (desktop) devices */
+@media (hover: hover) and (pointer: fine) {
+  html,
+  body,
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    cursor: none !important;
+  }
 }
 
 @layer base {

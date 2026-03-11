@@ -37,6 +37,8 @@ export const BackgroundVideo = forwardRef<HTMLAudioElement, BackgroundVideoProps
           ref={ref}
           autoPlay
           loop
+          preload="auto"
+          playsInline
           src="/lofi.mp3"
           onCanPlay={handleLoaded} // Consider loaded when audio can play? Or image?
         />

@@ -51,6 +51,53 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const audio = videoRef.current;
+    if (!audio) return;
+
+    const events: Array<keyof WindowEventMap> = ["pointerdown", "keydown", "touchstart"];
+
+    const handleFirstInteraction = () => {
+      audio.muted = false;
+      setIsMuted(false);
+
+      audio
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
+
+      events.forEach((eventName) => {
+        window.removeEventListener(eventName, handleFirstInteraction);
+      });
+    };
+
+    // Best effort autoplay with sound first.
+    audio.muted = false;
+    setIsMuted(false);
+    audio
+      .play()
+      .then(() => setIsPlaying(true))
+      .catch(() => {
+        // If blocked, try muted autoplay, then wait for first user interaction to unmute and play.
+        audio.muted = true;
+        setIsMuted(true);
+        audio
+          .play()
+          .then(() => setIsPlaying(true))
+          .catch(() => setIsPlaying(false));
+
+        events.forEach((eventName) => {
+          window.addEventListener(eventName, handleFirstInteraction, { once: true });
+        });
+      });
+
+    return () => {
+      events.forEach((eventName) => {
+        window.removeEventListener(eventName, handleFirstInteraction);
+      });
+    };
+  }, []);
+
+  useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       try {
@@ -140,7 +187,7 @@ export default function Home() {
 
       {/* Centered Content Container - Using Grid for robust centering */}
       <div className="fixed inset-0 z-20 grid place-items-center p-4">
-        <div className="w-full max-w-[360px] mx-auto flex justify-center">
+        <div className="w-full max-w-90 mx-auto flex justify-center">
           <ProfileCard
             isMuted={isMuted}
             isPlaying={isPlaying}
