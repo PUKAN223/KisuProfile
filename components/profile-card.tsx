@@ -1,6 +1,12 @@
 "use client";
 
-import { type RefObject, useEffect, useRef, useState } from "react";
+import {
+  type PointerEvent as ReactPointerEvent,
+  type RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import {
   Calendar,
@@ -20,12 +26,6 @@ import { SocialIcons } from "./social-icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import styles from "./profile-card.module.css";
 
 interface SpotifyData {
@@ -71,6 +71,8 @@ export function ProfileCard(
   const [avatarUrl, setAvatarUrl] = useState("");
   const [typedText, setTypedText] = useState("");
   const [spotifyData, setSpotifyData] = useState<SpotifyData | null>(null);
+  const [isSongCardOpen, setIsSongCardOpen] = useState(false);
+  const songCardRef = useRef<HTMLDivElement | null>(null);
   const fullText = "Coding is my life.";
   const userId = "889470463510712320";
 
@@ -171,55 +173,102 @@ export function ProfileCard(
     }
   }, [showContent, isPlaying, typedText]);
 
+  useEffect(() => {
+    if (!isSongCardOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        songCardRef.current &&
+        !songCardRef.current.contains(event.target as Node)
+      ) {
+        setIsSongCardOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSongCardOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isSongCardOpen]);
+
+  const handleAvatarPointerEnter = (event: ReactPointerEvent) => {
+    if (event.pointerType === "mouse") {
+      setIsSongCardOpen(true);
+    }
+  };
+
+  const handleAvatarPointerLeave = (event: ReactPointerEvent) => {
+    if (event.pointerType === "mouse") {
+      setIsSongCardOpen(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className={styles.avatarWrapper}>
-            <div className={styles.avatarGlow} />
-            <div className={styles.avatarBorder} />
-            <Image
-              src={avatarUrl || "/profile.jpg"}
-              alt="Profile"
-              width={100}
-              height={100}
-              className={styles.avatar}
-              priority
-            />
-            {spotifyData?.is_playing && (
-              <div className="absolute bottom-0 right-0 z-20 animate-in zoom-in duration-300">
-                {/* Outer glow ring */}
-                <div className="absolute inset-[-6px] rounded-full bg-[#1DB954]/25 blur-[10px]" />
-                {/* Glass badge */}
-                <div
-                  className="relative w-7 h-7 rounded-full flex items-center justify-center overflow-hidden border border-[#1DB954]/40 shadow-[0_0_12px_rgba(29,185,84,0.45),inset_0_1px_0_rgba(255,255,255,0.25)]"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(29,185,84,0.55) 0%, rgba(29,185,84,0.25) 50%, rgba(0,0,0,0.4) 100%)",
-                    backdropFilter: "blur(20px)",
-                    WebkitBackdropFilter: "blur(20px)",
-                  }}
-                >
-                  {/* Inner specular highlight */}
-                  <div className="absolute top-0.5 left-1 w-3.5 h-1.5 rounded-full bg-white/30 blur-[4px]" />
-                  {/* Dark ring separator from avatar */}
-                  <div className="absolute inset-0 rounded-full ring-2 ring-[#0d0d0d]/70" />
-                  <Music
-                    size={12}
-                    className="relative z-10 text-white drop-shadow-[0_0_4px_rgba(29,185,84,0.9)] animate-pulse"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        </TooltipTrigger>
-        <TooltipContent
-          side="bottom"
-          sideOffset={10}
-          className="bg-[#121212]/95 backdrop-blur-xl border border-white/10 text-white p-0 rounded-xl shadow-2xl overflow-hidden z-[60]"
+      <div
+        ref={songCardRef}
+        className={styles.avatarArea}
+        onPointerEnter={handleAvatarPointerEnter}
+        onPointerLeave={handleAvatarPointerLeave}
+      >
+        <button
+          type="button"
+          className={styles.avatarWrapper}
+          aria-label="View current song"
+          aria-expanded={isSongCardOpen}
+          onClick={() => setIsSongCardOpen((isOpen) => !isOpen)}
         >
-          {spotifyData?.is_playing
-            ? (
+          <div className={styles.avatarGlow} />
+          <div className={styles.avatarBorder} />
+          <Image
+            src={avatarUrl || "/profile.jpg"}
+            alt="Profile"
+            width={100}
+            height={100}
+            className={styles.avatar}
+            priority
+          />
+          {spotifyData?.is_playing && (
+            <div className="absolute bottom-0 right-0 z-20 animate-in zoom-in duration-300">
+              {/* Outer glow ring */}
+              <div className="absolute inset-[-6px] rounded-full bg-[#1DB954]/25 blur-[10px]" />
+              {/* Glass badge */}
+              <div
+                className="relative w-7 h-7 rounded-full flex items-center justify-center overflow-hidden border border-[#1DB954]/40 shadow-[0_0_12px_rgba(29,185,84,0.45),inset_0_1px_0_rgba(255,255,255,0.25)]"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(29,185,84,0.55) 0%, rgba(29,185,84,0.25) 50%, rgba(0,0,0,0.4) 100%)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
+                }}
+              >
+                {/* Inner specular highlight */}
+                <div className="absolute top-0.5 left-1 w-3.5 h-1.5 rounded-full bg-white/30 blur-[4px]" />
+                {/* Dark ring separator from avatar */}
+                <div className="absolute inset-0 rounded-full ring-2 ring-[#0d0d0d]/70" />
+                <Music
+                  size={12}
+                  className="relative z-10 text-white drop-shadow-[0_0_4px_rgba(29,185,84,0.9)] animate-pulse"
+                />
+              </div>
+            </div>
+          )}
+        </button>
+        {isSongCardOpen && (
+          <div
+            role="status"
+            className="absolute left-1/2 top-full z-[60] mt-2 -translate-x-1/2 bg-[#121212]/95 backdrop-blur-xl border border-white/10 text-white p-0 rounded-xl shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-top-2"
+          >
+            {spotifyData?.is_playing ? (
               <div className="flex items-center gap-3 p-3 min-w-[220px] max-w-[260px]">
                 <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 shadow-lg border border-white/5">
                   {spotifyData.cover && (
@@ -262,14 +311,14 @@ export function ProfileCard(
                   </div>
                 </div>
               </div>
-            )
-            : (
+            ) : (
               <div className="p-3 text-xs font-medium text-white/50">
                 Not playing anything...
               </div>
             )}
-        </TooltipContent>
-      </Tooltip>
+          </div>
+        )}
+      </div>
 
       <div className={styles.nameSection}>
         <h1 className={styles.name}>Kisu X3</h1>
