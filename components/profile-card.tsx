@@ -73,6 +73,7 @@ export function ProfileCard(
   const [spotifyData, setSpotifyData] = useState<SpotifyData | null>(null);
   const [isSongCardOpen, setIsSongCardOpen] = useState(false);
   const songCardRef = useRef<HTMLDivElement | null>(null);
+  const songCardId = "current-song-card";
   const fullText = "Coding is my life.";
   const userId = "889470463510712320";
 
@@ -225,6 +226,7 @@ export function ProfileCard(
           className={styles.avatarWrapper}
           aria-label="View current song"
           aria-expanded={isSongCardOpen}
+          aria-controls={songCardId}
           onClick={() => setIsSongCardOpen((isOpen) => !isOpen)}
         >
           <div className={styles.avatarGlow} />
@@ -265,7 +267,9 @@ export function ProfileCard(
         </button>
         {isSongCardOpen && (
           <div
-            role="status"
+            id={songCardId}
+            role="dialog"
+            aria-label="Current song"
             className="absolute left-1/2 top-full z-[60] mt-2 -translate-x-1/2 bg-[#121212]/95 backdrop-blur-xl border border-white/10 text-white p-0 rounded-xl shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-top-2"
           >
             {spotifyData?.is_playing ? (

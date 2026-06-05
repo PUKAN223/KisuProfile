@@ -4,13 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BackgroundVideo } from "@/components/background-video";
 import { ProfileCard } from "@/components/profile-card";
 import { Portfolio } from "@/components/portfolio";
+import { StatsFmShowcase } from "@/components/stats-fm-showcase";
 import { EducationTimeline } from "@/components/education-timeline";
 import { ViewCounter } from "@/components/view-counter";
 import { CursorEffects } from "@/components/cursor-effects";
 import { IntroScreen } from "@/components/intro-screen";
 
-type Section = "hero" | "timeline" | "portfolio";
-const SECTIONS: Section[] = ["hero", "timeline", "portfolio"];
+type Section = "hero" | "timeline" | "portfolio" | "music";
+const SECTIONS: Section[] = ["hero", "timeline", "portfolio", "music"];
 
 export default function Home() {
   const [introComplete, setIntroComplete] = useState(false);
@@ -32,6 +33,7 @@ export default function Home() {
     hero: null,
     timeline: null,
     portfolio: null,
+    music: null,
   });
   const isAnimatingRef = useRef(false);
   const currentIndexRef = useRef(0);
@@ -471,6 +473,18 @@ export default function Home() {
           style={{ height: "100dvh", minHeight: "100dvh" }}
         >
           <Portfolio visible={siteVisible && activeSection === "portfolio"} />
+        </section>
+
+        {/* Music Stats */}
+        <section
+          ref={(el) => {
+            sectionRefs.current.music = el;
+          }}
+          data-section="music"
+          className="relative w-full"
+          style={{ height: "100dvh", minHeight: "100dvh" }}
+        >
+          <StatsFmShowcase />
         </section>
       </div>
 
