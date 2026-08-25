@@ -70,7 +70,7 @@ export function ProjectSection() {
             <Loader2 size={24} className="animate-spin" style={{ color: DS.text3 }} />
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {projects.map((project, i) => (
               <ProjectCard
                 key={project.id}

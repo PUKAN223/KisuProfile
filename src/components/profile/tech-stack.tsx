@@ -128,7 +128,7 @@ export function TechStack() {
       </div>
 
       {/* Categorized grid */}
-      <div style={{ padding: "0 24px" }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 md:gap-x-12" style={{ padding: "0 24px" }}>
         {techStack.map((group, i) => (
           <CategoryGroup
             key={group.category}

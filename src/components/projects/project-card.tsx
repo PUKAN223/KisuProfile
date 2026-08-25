@@ -15,11 +15,11 @@ interface Project {
 
 // Deterministic tilt + offset per card index
 const CARD_STYLES = [
-  { rotate: -2.2,  x: 6,  originY: "top"    },
-  { rotate: 1.8,   x: -10, originY: "bottom" },
-  { rotate: -1.2,  x: 4,  originY: "top"    },
-  { rotate: 2.5,   x: -6, originY: "bottom" },
-  { rotate: -0.8,  x: 8,  originY: "top"    },
+  { rotate: -2.2, x: 6, originY: "top" },
+  { rotate: 1.8, x: -10, originY: "bottom" },
+  { rotate: -1.2, x: 4, originY: "top" },
+  { rotate: 2.5, x: -6, originY: "bottom" },
+  { rotate: -0.8, x: 8, originY: "top" },
 ];
 
 export function ProjectCard({
@@ -35,8 +35,9 @@ export function ProjectCard({
 
   return (
     <motion.div
+      className="group"
       initial={{ opacity: 0, y: 24, rotate: tilt.rotate * 1.8 }}
-      animate={{ opacity: 1, y: 0,  rotate: tilt.rotate }}
+      animate={{ opacity: 1, y: 0, rotate: tilt.rotate }}
       transition={{ duration: 0.5, delay: index * 0.08, type: "spring", stiffness: 160, damping: 20 }}
       whileHover={{ rotate: 0, y: -6, transition: { duration: 0.22 } }}
       whileTap={{ scale: 0.97 }}
@@ -50,10 +51,8 @@ export function ProjectCard({
       onClick={onClick}
     >
       <div
+        className="transition-all duration-300 bg-[#121212]/85 group-hover:bg-[#1e1e1e]/90 border border-white/10 group-hover:border-white/30 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] backdrop-blur-md"
         style={{
-          background: "rgba(18,18,18,0.85)",
-          backdropFilter: "blur(10px)",
-          border: b,
           padding: "20px 20px 18px",
         }}
       >
@@ -67,6 +66,7 @@ export function ProjectCard({
           </h3>
           <ArrowUpRight
             size={14}
+            className="transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white"
             style={{ color: DS.text3, flexShrink: 0, marginLeft: 12, marginTop: 1 }}
           />
         </div>

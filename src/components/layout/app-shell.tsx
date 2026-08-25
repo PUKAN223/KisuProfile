@@ -8,7 +8,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <>
       <OceanBackground />
       <Navbar />
-      <main className="relative z-10" style={{ paddingTop: 80, paddingBottom: 56, overflowX: "hidden" }}>
+      <main className="relative z-10 max-w-2xl mx-auto w-full" style={{ paddingTop: 80, paddingBottom: 56, overflowX: "hidden" }}>
         {children}
       </main>
     </>
