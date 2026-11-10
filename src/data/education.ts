@@ -18,7 +18,7 @@ export const education = [
     description:
       "Science Classrooms in University Affiliated School. Science, mathematics, and research-based learning with university collaboration.",
     tags: ["Mathematics", "Science Research", "University"],
-    logo: "https://webmaster.edu.cmu.ac.th/assets/upload/files/2021/04/20210408212243_40486.png",
+    logo: "https://webmaster.edu.cmu.ac.th/assets/upload/site_thumbnail/2023/03/rdwbioyszf_20230331160605.png",
   },
   {
     id: "posn-comp",
